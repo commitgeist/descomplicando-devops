@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  policy.default: role:readonly
+  policy.csv: |
+    # Exemplo 1: Permissões diretas para um usuário/grupo específico (usando ID do SSO/OAuth)
+    p, "user-id-12345678-1234-1234-1234-123456789abc", applications, *, */*, allow
+    p, "user-id-12345678-1234-1234-1234-123456789abc", clusters, get, *, allow
+    p, "user-id-12345678-1234-1234-1234-123456789abc", repositories, get, *, allow
+    p, "user-id-12345678-1234-1234-1234-123456789abc", repositories, create, *, allow
+    p, "user-id-12345678-1234-1234-1234-123456789abc", repositories, update, *, allow
+    p, "user-id-12345678-1234-1234-1234-123456789abc", repositories, delete, *, allow
+
+    # Exemplo 2: Permissões para outro usuário/grupo
+    p, "user-id-87654321-4321-4321-4321-cba987654321", applications, *, */*, allow
+    p, "user-id-87654321-4321-4321-4321-cba987654321", clusters, get, *, allow
+    p, "user-id-87654321-4321-4321-4321-cba987654321", repositories, get, *, allow
+---
+# Exemplo 3: Usando roles customizadas e grupos
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  policy.csv: |
+    # Definindo permissões para a role customizada 'org-admin'
+    p, role:org-admin, applications, *, */*, allow
+    p, role:org-admin, clusters, get, *, allow
+    p, role:org-admin, repositories, get, *, allow
+    p, role:org-admin, repositories, create, *, allow
+    p, role:org-admin, repositories, update, *, allow
+    p, role:org-admin, repositories, delete, *, allow
+
+    # Atribuindo usuários/grupos à role 'admin' (usando IDs de exemplo do SSO)
+    g, "user-id-aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", role:admin
+    g, "user-id-11111111-2222-3333-4444-555555555555", role:admin
+  policy.default: role:readonly
